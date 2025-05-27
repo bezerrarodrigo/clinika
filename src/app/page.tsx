@@ -1,6 +1,11 @@
+import { Button } from "@/components/ui/button";
+
 const Home = () => {
   return (
-    <div className="text-2xl font-semibold text-red-500">Home component</div>
+    <div className="text-2xl font-semibold">
+      <h1>Home Component</h1>
+      <Button>Clique aqui</Button>
+    </div>
   );
 };
 
