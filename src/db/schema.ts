@@ -24,7 +24,7 @@ export const usersTableRelations = relations(usersTable, ({ many }) => ({
   usersToClinics: many(usersToClinicsTable),
 }));
 
-export const session = pgTable("session", {
+export const sessionsTable = pgTable("sessions", {
   id: text("id").primaryKey(),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
@@ -37,7 +37,7 @@ export const session = pgTable("session", {
     .references(() => usersTable.id, { onDelete: "cascade" }),
 });
 
-export const account = pgTable("account", {
+export const accountsTable = pgTable("accounts", {
   id: text("id").primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
@@ -55,7 +55,7 @@ export const account = pgTable("account", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const verification = pgTable("verification", {
+export const verificationsTable = pgTable("verifications", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
