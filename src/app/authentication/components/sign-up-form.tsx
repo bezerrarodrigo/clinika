@@ -1,6 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -22,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
+import { authClient } from "@/lib/auth-client";
 const registerSchema = z.object({
   name: z.string().trim().min(3, "Nome é obrigatório."),
   email: z
@@ -34,6 +36,9 @@ const registerSchema = z.object({
 });
 
 export function SignUpForm() {
+  //hooks
+  const route = useRouter();
+
   const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -43,8 +48,21 @@ export function SignUpForm() {
     },
   });
 
-  function registerSubmit(values: z.infer<typeof registerSchema>) {
-    console.log(values);
+  async function registerSubmit(values: z.infer<typeof registerSchema>) {
+    //auth
+    await authClient.signUp.email(
+      {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      },
+      {
+        onSuccess: () => {
+          route.push("/dashboard");
+        },
+      },
+    );
+
     form.reset();
   }
 
@@ -107,8 +125,16 @@ export function SignUpForm() {
             />
           </CardContent>
           <CardFooter>
-            <Button className="w-full" type="submit">
-              Criar conta
+            <Button
+              className="w-full cursor-pointer"
+              type="submit"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                "Criar conta"
+              )}
             </Button>
           </CardFooter>
         </form>
