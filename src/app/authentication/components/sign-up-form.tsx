@@ -62,8 +62,6 @@ export function SignUpForm() {
         },
       },
     );
-
-    form.reset();
   }
 
   return (
