@@ -114,7 +114,7 @@ export function SignInForm() {
             <Button
               disabled={loginForm.formState.isSubmitting}
               type="submit"
-              className="w-full cursor-pointer"
+              className="w-full"
             >
               {loginForm.formState.isSubmitting ? (
                 <Loader2 className="animate-spin" />
