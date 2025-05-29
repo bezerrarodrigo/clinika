@@ -78,7 +78,7 @@ export function SignInForm() {
               Faça login com seu usuário e senha para continuar.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-6">
             <FormField
               control={loginForm.control}
               name="email"
