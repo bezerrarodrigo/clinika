@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -65,6 +66,13 @@ export function SignInForm() {
     );
   }
 
+  async function hadnleSignInWithGoogle() {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
+  }
+
   return (
     <Card>
       <Form {...loginForm}>
@@ -110,7 +118,7 @@ export function SignInForm() {
               )}
             />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col gap-4">
             <Button
               disabled={loginForm.formState.isSubmitting}
               type="submit"
@@ -121,6 +129,20 @@ export function SignInForm() {
               ) : (
                 "Entrar"
               )}
+            </Button>
+            <Button
+              variant="secondary"
+              type="button"
+              className="w-full"
+              onClick={hadnleSignInWithGoogle}
+            >
+              <Image
+                src="/google_icon.svg"
+                alt="Google Icon"
+                width={22}
+                height={22}
+              />
+              Entrar com Google
             </Button>
           </CardFooter>
         </form>
