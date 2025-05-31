@@ -27,15 +27,17 @@ export const auth = betterAuth({
         },
       });
       // TODO: Handle case where user has more than one clinic
-      const clinic = userClinics[0];
+      const clinic = userClinics?.[0];
       return {
-        ...session,
+        session,
         user: {
           ...user,
-          clinic: {
-            id: clinic.clinicId,
-            name: clinic.clinic.name,
-          },
+          clinic: clinic?.clinicId
+            ? {
+                id: clinic?.clinicId,
+                name: clinic?.clinic?.name,
+              }
+            : undefined,
         },
       };
     }),

@@ -133,13 +133,13 @@ export function AppSidebar() {
                   <Avatar>
                     <AvatarImage src="" />
                     <AvatarFallback>
-                      {session.data?.user.clinic.name
+                      {session.data?.user.clinic?.name
                         .slice(0, 2)
                         .toLocaleUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm">{session.data?.user.clinic.name}</p>
+                    <p className="text-sm">{session.data?.user.clinic?.name}</p>
                     <p className="text-muted-foreground text-sm">
                       {session.data?.user.email}
                     </p>
