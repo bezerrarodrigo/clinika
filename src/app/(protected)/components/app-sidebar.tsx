@@ -16,7 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,6 +69,7 @@ const otherItems = [
 export function AppSidebar() {
   //hooks
   const router = useRouter();
+  const session = authClient.useSession();
 
   //functions
   async function handleSignOut() {
@@ -127,15 +128,30 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button>clique aqui</Button>
+                <SidebarMenuButton className="cursor-pointer" size="lg">
+                  <Avatar>
+                    <AvatarImage src="" />
+                    <AvatarFallback>
+                      {session.data?.user.clinic.name
+                        .slice(0, 2)
+                        .toLocaleUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm">{session.data?.user.clinic.name}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {session.data?.user.email}
+                    </p>
+                  </div>
+                </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="center">
                 <DropdownMenuItem
-                  className="flex gap-2"
+                  className="flex cursor-pointer items-center gap-2"
                   onClick={handleSignOut}
                 >
-                  <LogOut />
-                  Sair
+                  <LogOut size={20} />
+                  <p className="text-sm">Sair</p>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
