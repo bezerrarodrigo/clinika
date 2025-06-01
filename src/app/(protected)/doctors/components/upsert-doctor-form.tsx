@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { NumericFormat } from "react-number-format";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,7 @@ import { medicalSpecialties } from "../constants";
 const UpsertDoctorFormSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório."),
   specialty: z.string().trim().min(1, "Especialidade é obrigatória."),
-  appointmentPrice: z.number().min(1, "Preço da consulta é obrigatório."),
+  appointmentPrice: z.string().min(1, "Preço da consulta é obrigatório."),
   availableFromWeekDay: z.number(),
   availableToWeekDay: z.number(),
   availableFromTime: z
@@ -57,9 +58,9 @@ export const UpsertDoctorForm = () => {
     defaultValues: {
       name: "",
       specialty: "",
-      appointmentPrice: 0,
-      availableFromWeekDay: 0,
-      availableToWeekDay: 0,
+      appointmentPrice: "0",
+      availableFromWeekDay: 1,
+      availableToWeekDay: 5,
       availableFromTime: "",
       availableToTime: "",
     },
@@ -101,26 +102,23 @@ export const UpsertDoctorForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Especialidade</FormLabel>
-                <FormControl>
-                  <Select {...field}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione uma especialidade" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Especialidades</SelectLabel>
-                        {medicalSpecialties.map((specialty) => (
-                          <SelectItem
-                            key={specialty.value}
-                            value={specialty.value}
-                          >
-                            {specialty.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
+                  </FormControl>
+                  <SelectContent>
+                    {medicalSpecialties.map((specialty) => (
+                      <SelectItem key={specialty.value} value={specialty.value}>
+                        {specialty.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -132,12 +130,202 @@ export const UpsertDoctorForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Preço da consulta</FormLabel>
+                <NumericFormat
+                  {...field}
+                  customInput={Input}
+                  placeholder="Preço da consulta"
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
+                  decimalScale={2}
+                  fixedDecimalScale
+                  allowNegative={false}
+                  onValueChange={(values) => {
+                    field.onChange(values.floatValue || 0);
+                  }}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="availableFromWeekDay"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Dia inicial da semana</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Preço da consulta"
-                    {...field}
-                  />
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione o dia inicial" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Dias da semana</SelectLabel>
+                        <SelectItem value="0">Domingo</SelectItem>
+                        <SelectItem value="1">Segunda-feira</SelectItem>
+                        <SelectItem value="2">Terça-feira</SelectItem>
+                        <SelectItem value="3">Quarta-feira</SelectItem>
+                        <SelectItem value="4">Quinta-feira</SelectItem>
+                        <SelectItem value="5">Sexta-feira</SelectItem>
+                        <SelectItem value="6">Sábado</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="availableToWeekDay"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Dia final da semana</FormLabel>
+                <FormControl>
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione o dia final" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Dias da semana</SelectLabel>
+                        <SelectItem value="0">Domingo</SelectItem>
+                        <SelectItem value="1">Segunda-feira</SelectItem>
+                        <SelectItem value="2">Terça-feira</SelectItem>
+                        <SelectItem value="3">Quarta-feira</SelectItem>
+                        <SelectItem value="4">Quinta-feira</SelectItem>
+                        <SelectItem value="5">Sexta-feira</SelectItem>
+                        <SelectItem value="6">Sábado</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="availableFromTime"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Horário inicial de disponibilidade</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Horário inicial" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Manhã</SelectLabel>
+                        {Array.from({ length: (12 - 7) * 2 }, (_, i) => {
+                          const hour = 7 + Math.floor(i / 2);
+                          const minute = i % 2 === 0 ? "00" : "30";
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          return (
+                            <SelectItem key={value} value={value}>
+                              {value}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Tarde</SelectLabel>
+                        {Array.from({ length: (18 - 13) * 2 + 1 }, (_, i) => {
+                          const hour = 13 + Math.floor(i / 2);
+                          const minute = i % 2 === 0 ? "00" : "30";
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          return (
+                            <SelectItem key={value} value={value}>
+                              {value}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Noite</SelectLabel>
+                        {Array.from({ length: (23 - 19) * 2 + 1 }, (_, i) => {
+                          const hour = 19 + Math.floor(i / 2);
+                          const minute = i % 2 === 0 ? "00" : "30";
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          return (
+                            <SelectItem key={value} value={value}>
+                              {value}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="availableToTime"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Horário final de disponibilidade</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Horário final" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Manhã</SelectLabel>
+                        {Array.from({ length: (12 - 7) * 2 }, (_, i) => {
+                          const hour = 7 + Math.floor(i / 2);
+                          const minute = i % 2 === 0 ? "00" : "30";
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          return (
+                            <SelectItem key={value} value={value}>
+                              {value}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Tarde</SelectLabel>
+                        {Array.from({ length: (18 - 13) * 2 + 1 }, (_, i) => {
+                          const hour = 13 + Math.floor(i / 2);
+                          const minute = i % 2 === 0 ? "00" : "30";
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          return (
+                            <SelectItem key={value} value={value}>
+                              {value}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Noite</SelectLabel>
+                        {Array.from({ length: (23 - 19) * 2 + 1 }, (_, i) => {
+                          const hour = 19 + Math.floor(i / 2);
+                          const minute = i % 2 === 0 ? "00" : "30";
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          return (
+                            <SelectItem key={value} value={value}>
+                              {value}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
