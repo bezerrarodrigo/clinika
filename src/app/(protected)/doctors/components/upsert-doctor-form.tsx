@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
@@ -67,7 +68,11 @@ const UpsertDoctorFormSchema = z
 
 type UpsertDoctorFormValues = z.infer<typeof UpsertDoctorFormSchema>;
 
-export const UpsertDoctorForm = () => {
+interface UpsertDoctorFormProps {
+  onSuccess?: () => void;
+}
+
+export const UpsertDoctorForm = (props: UpsertDoctorFormProps) => {
   const form = useForm<UpsertDoctorFormValues>({
     resolver: zodResolver(UpsertDoctorFormSchema),
     defaultValues: {
@@ -85,6 +90,8 @@ export const UpsertDoctorForm = () => {
   const upsertDoctorAction = useAction(upsertDoctorFormAction, {
     onSuccess: () => {
       toast.success("Médico adicionado com sucesso!");
+      props.onSuccess?.();
+      form.reset();
     },
     onError: () => {
       toast.error(`Erro ao adicionar médico.`);
@@ -365,6 +372,9 @@ export const UpsertDoctorForm = () => {
 
           <DialogFooter>
             <Button disabled={upsertDoctorAction.isPending} type="submit">
+              {upsertDoctorAction.isPending && (
+                <Loader2 className="mr-2 animate-spin" />
+              )}
               Adicionar
             </Button>
           </DialogFooter>
