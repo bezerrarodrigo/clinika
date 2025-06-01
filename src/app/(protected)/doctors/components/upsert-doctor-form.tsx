@@ -34,21 +34,31 @@ import {
 
 import { medicalSpecialties } from "../constants";
 
-const UpsertDoctorFormSchema = z.object({
-  name: z.string().trim().min(1, "Nome é obrigatório."),
-  specialty: z.string().trim().min(1, "Especialidade é obrigatória."),
-  appointmentPrice: z.string().min(1, "Preço da consulta é obrigatório."),
-  availableFromWeekDay: z.number(),
-  availableToWeekDay: z.number(),
-  availableFromTime: z
-    .string()
-    .trim()
-    .min(1, "Horário de início é obrigatório."),
-  availableToTime: z
-    .string()
-    .trim()
-    .min(1, "Horário de término é obrigatório."),
-});
+const UpsertDoctorFormSchema = z
+  .object({
+    name: z.string().trim().min(1, "Nome é obrigatório."),
+    specialty: z.string().trim().min(1, "Especialidade é obrigatória."),
+    appointmentPrice: z.string().min(1, "Preço da consulta é obrigatório."),
+    availableFromWeekDay: z.number(),
+    availableToWeekDay: z.number(),
+    availableFromTime: z
+      .string()
+      .trim()
+      .min(1, "Horário de início é obrigatório."),
+    availableToTime: z
+      .string()
+      .trim()
+      .min(1, "Horário de término é obrigatório."),
+  })
+  .refine(
+    (data) => {
+      return data.availableToTime >= data.availableFromTime;
+    },
+    {
+      message: "Horário de término não deve ser anterior ao horário inicial.",
+      path: ["availableToTime"],
+    },
+  );
 
 type UpsertDoctorFormValues = z.infer<typeof UpsertDoctorFormSchema>;
 
@@ -232,7 +242,7 @@ export const UpsertDoctorForm = () => {
                         {Array.from({ length: (12 - 7) * 2 }, (_, i) => {
                           const hour = 7 + Math.floor(i / 2);
                           const minute = i % 2 === 0 ? "00" : "30";
-                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}:00`;
                           return (
                             <SelectItem key={value} value={value}>
                               {value}
@@ -245,7 +255,7 @@ export const UpsertDoctorForm = () => {
                         {Array.from({ length: (18 - 13) * 2 + 1 }, (_, i) => {
                           const hour = 13 + Math.floor(i / 2);
                           const minute = i % 2 === 0 ? "00" : "30";
-                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}:00`;
                           return (
                             <SelectItem key={value} value={value}>
                               {value}
@@ -258,7 +268,7 @@ export const UpsertDoctorForm = () => {
                         {Array.from({ length: (23 - 19) * 2 + 1 }, (_, i) => {
                           const hour = 19 + Math.floor(i / 2);
                           const minute = i % 2 === 0 ? "00" : "30";
-                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}:00`;
                           return (
                             <SelectItem key={value} value={value}>
                               {value}
@@ -290,7 +300,7 @@ export const UpsertDoctorForm = () => {
                         {Array.from({ length: (12 - 7) * 2 }, (_, i) => {
                           const hour = 7 + Math.floor(i / 2);
                           const minute = i % 2 === 0 ? "00" : "30";
-                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}:00`;
                           return (
                             <SelectItem key={value} value={value}>
                               {value}
@@ -303,7 +313,7 @@ export const UpsertDoctorForm = () => {
                         {Array.from({ length: (18 - 13) * 2 + 1 }, (_, i) => {
                           const hour = 13 + Math.floor(i / 2);
                           const minute = i % 2 === 0 ? "00" : "30";
-                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}:00`;
                           return (
                             <SelectItem key={value} value={value}>
                               {value}
@@ -316,7 +326,7 @@ export const UpsertDoctorForm = () => {
                         {Array.from({ length: (23 - 19) * 2 + 1 }, (_, i) => {
                           const hour = 19 + Math.floor(i / 2);
                           const minute = i % 2 === 0 ? "00" : "30";
-                          const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+                          const value = `${hour.toString().padStart(2, "0")}:${minute}:00`;
                           return (
                             <SelectItem key={value} value={value}>
                               {value}
