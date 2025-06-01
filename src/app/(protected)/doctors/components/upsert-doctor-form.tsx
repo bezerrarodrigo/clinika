@@ -1,10 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
+import { toast } from "sonner";
 import { z } from "zod";
 
+import { upsertDoctorFormAction } from "@/actions/upsert-doctor-form";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -38,7 +41,9 @@ const UpsertDoctorFormSchema = z
   .object({
     name: z.string().trim().min(1, "Nome é obrigatório."),
     specialty: z.string().trim().min(1, "Especialidade é obrigatória."),
-    appointmentPrice: z.string().min(1, "Preço da consulta é obrigatório."),
+    appointmentPriceInCents: z
+      .string()
+      .min(1, "Preço da consulta é obrigatório."),
     availableFromWeekDay: z.number(),
     availableToWeekDay: z.number(),
     availableFromTime: z
@@ -68,7 +73,7 @@ export const UpsertDoctorForm = () => {
     defaultValues: {
       name: "",
       specialty: "",
-      appointmentPrice: "0",
+      appointmentPriceInCents: "0",
       availableFromWeekDay: 1,
       availableToWeekDay: 5,
       availableFromTime: "",
@@ -76,10 +81,26 @@ export const UpsertDoctorForm = () => {
     },
   });
 
-  //functions
-  const onsubmit = (data: UpsertDoctorFormValues) => {
-    console.log("Form submitted with data:", data);
-    // Here you would typically handle the form submission, e.g., send data to an API
+  // hooks
+  const upsertDoctorAction = useAction(upsertDoctorFormAction, {
+    onSuccess: () => {
+      toast.success("Médico adicionado com sucesso!");
+    },
+    onError: () => {
+      toast.error(`Erro ao adicionar médico.`);
+    },
+  });
+
+  // functions
+  const onsubmit = (values: z.infer<typeof UpsertDoctorFormSchema>) => {
+    upsertDoctorAction.execute({
+      ...values,
+      availableFromWeekDay: Number(values.availableFromWeekDay),
+      availableToWeekDay: Number(values.availableToWeekDay),
+      appointmentPriceInCents: Number(
+        values.appointmentPriceInCents.replace(/\D/g, ""),
+      ),
+    });
   };
 
   return (
@@ -136,7 +157,7 @@ export const UpsertDoctorForm = () => {
 
           <FormField
             control={form.control}
-            name="appointmentPrice"
+            name="appointmentPriceInCents"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Preço da consulta</FormLabel>
@@ -343,7 +364,9 @@ export const UpsertDoctorForm = () => {
           />
 
           <DialogFooter>
-            <Button type="submit">Adicionar</Button>
+            <Button disabled={upsertDoctorAction.isPending} type="submit">
+              Adicionar
+            </Button>
           </DialogFooter>
         </form>
       </Form>
